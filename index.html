@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Step Back">
+    <meta name="theme-color" content="#5a7d8c">
+    <meta name="description" content="Track daily progress on stepping back from overfunctioning">
+
+    <title>Step Back</title>
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Lock Screen -->
+    <div id="lock-screen" class="screen active">
+        <div class="lock-container">
+            <h1>Step Back</h1>
+            <p id="lock-message">Enter your PIN to unlock</p>
+            <div class="pin-display">
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+            </div>
+            <div class="pin-pad">
+                <button class="pin-btn" data-num="1">1</button>
+                <button class="pin-btn" data-num="2">2</button>
+                <button class="pin-btn" data-num="3">3</button>
+                <button class="pin-btn" data-num="4">4</button>
+                <button class="pin-btn" data-num="5">5</button>
+                <button class="pin-btn" data-num="6">6</button>
+                <button class="pin-btn" data-num="7">7</button>
+                <button class="pin-btn" data-num="8">8</button>
+                <button class="pin-btn" data-num="9">9</button>
+                <button class="pin-btn" data-num="clear">&#x232B;</button>
+                <button class="pin-btn" data-num="0">0</button>
+                <button class="pin-btn" data-num="enter">&#x2192;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Setup Screen (First Time) -->
+    <div id="setup-screen" class="screen">
+        <div class="setup-container">
+            <h1>Welcome</h1>
+            <p>Create a 6-digit PIN to encrypt your data.</p>
+            <p class="small-text">Your data stays on this device, encrypted.</p>
+            <div class="pin-display">
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+            </div>
+            <p id="setup-step">Enter new PIN</p>
+            <div class="pin-pad">
+                <button class="pin-btn" data-num="1">1</button>
+                <button class="pin-btn" data-num="2">2</button>
+                <button class="pin-btn" data-num="3">3</button>
+                <button class="pin-btn" data-num="4">4</button>
+                <button class="pin-btn" data-num="5">5</button>
+                <button class="pin-btn" data-num="6">6</button>
+                <button class="pin-btn" data-num="7">7</button>
+                <button class="pin-btn" data-num="8">8</button>
+                <button class="pin-btn" data-num="9">9</button>
+                <button class="pin-btn" data-num="clear">&#x232B;</button>
+                <button class="pin-btn" data-num="0">0</button>
+                <button class="pin-btn" data-num="enter">&#x2192;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app-screen" class="screen">
+        <!-- Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-view="checkin">
+                <span class="nav-icon">&#x2713;</span>
+                <span class="nav-label">Check-in</span>
+            </button>
+            <button class="nav-btn" data-view="patterns">
+                <span class="nav-icon">&#x25A6;</span>
+                <span class="nav-label">Patterns</span>
+            </button>
+            <button class="nav-btn" data-view="history">
+                <span class="nav-icon">&#x2630;</span>
+                <span class="nav-label">History</span>
+            </button>
+            <button class="nav-btn" data-view="settings">
+                <span class="nav-icon">&#x2699;</span>
+                <span class="nav-label">Settings</span>
+            </button>
+        </nav>
+
+        <!-- Check-in View -->
+        <div id="checkin-view" class="view active">
+            <div class="view-content">
+                <div class="checkin-header">
+                    <p class="date-display" id="today-date"></p>
+                </div>
+
+                <div class="quick-checkin" id="quick-checkin">
+                    <h2>Did you practice stepping back today?</h2>
+                    <div class="checkin-buttons">
+                        <button class="checkin-btn yes-btn" id="btn-yes">Yes</button>
+                        <button class="checkin-btn no-btn" id="btn-no">No</button>
+                    </div>
+                    <div class="note-section">
+                        <input type="text" id="quick-note" placeholder="Quick note (optional)" maxlength="100">
+                        <span class="char-count"><span id="char-count">0</span>/100</span>
+                    </div>
+                </div>
+
+                <div class="checkin-done" id="checkin-done" style="display: none;">
+                    <div class="done-message">
+                        <span class="done-icon">&#x2713;</span>
+                        <p>Checked in for today</p>
+                        <p class="done-response" id="done-response"></p>
+                        <p class="done-note" id="done-note"></p>
+                    </div>
+                    <button class="edit-btn" id="edit-checkin">Edit today's check-in</button>
+                </div>
+
+                <!-- Optional Deeper Reflection -->
+                <div class="reflection-section">
+                    <button class="expand-btn" id="expand-reflection">
+                        <span>Weekly Practices</span>
+                        <span class="expand-icon" id="expand-icon">&#x25BC;</span>
+                    </button>
+
+                    <div class="reflection-content" id="reflection-content">
+                        <div class="practice-item" data-day="monday">
+                            <div class="practice-header">
+                                <label class="practice-check">
+                                    <input type="checkbox" class="practice-checkbox" data-practice="monday">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <div class="practice-info">
+                                    <h3>Monday - Pause Practice</h3>
+                                    <p>Set 3 reminders to notice overfunctioning moments</p>
+                                </div>
+                                <button class="info-btn" data-practice="monday">?</button>
+                            </div>
+                            <div class="why-section" id="why-monday">
+                                <p>This practice builds metacognitive awareness - the ability to observe your automatic patterns. Research shows that mindfulness-based interventions help people modify automatic behaviors by creating space between trigger and response. While this specific "3 reminders" approach hasn't been tested in studies, it applies evidence-based principles of awareness training to overfunctioning patterns.</p>
+                            </div>
+                            <input type="text" class="practice-note" data-practice="monday" placeholder="Notes (optional)" maxlength="200">
+                        </div>
+
+                        <div class="practice-item" data-day="tuesday">
+                            <div class="practice-header">
+                                <label class="practice-check">
+                                    <input type="checkbox" class="practice-checkbox" data-practice="tuesday">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <div class="practice-info">
+                                    <h3>Tuesday - "Not My Circus"</h3>
+                                    <p>Practice letting someone else handle their own responsibility</p>
+                                </div>
+                                <button class="info-btn" data-practice="tuesday">?</button>
+                            </div>
+                            <div class="why-section" id="why-tuesday">
+                                <p>Research shows that people who set and maintain boundaries report higher life satisfaction and lower anxiety. In family systems theory, overfunctioning and underfunctioning exist as reciprocal patterns - when you step back, others have space to step up. This practice applies boundary-setting principles specifically to overfunctioning dynamics.</p>
+                            </div>
+                            <input type="text" class="practice-note" data-practice="tuesday" placeholder="Notes (optional)" maxlength="200">
+                        </div>
+
+                        <div class="practice-item" data-day="wednesday">
+                            <div class="practice-header">
+                                <label class="practice-check">
+                                    <input type="checkbox" class="practice-checkbox" data-practice="wednesday">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <div class="practice-info">
+                                    <h3>Wednesday - Schedule Personal Time</h3>
+                                    <p>Block 30 minutes for something you want (non-negotiable)</p>
+                                </div>
+                                <button class="info-btn" data-practice="wednesday">?</button>
+                            </div>
+                            <div class="why-section" id="why-wednesday">
+                                <p>Chronic self-sacrifice and overcommitment are linked to burnout. Studies on boundary-setting show that protecting personal time reduces emotional exhaustion. This practice reverses the overfunctioner's typical pattern of attending to everyone else's needs before their own.</p>
+                            </div>
+                            <input type="text" class="practice-note" data-practice="wednesday" placeholder="Notes (optional)" maxlength="200">
+                        </div>
+
+                        <div class="practice-item" data-day="thursday">
+                            <div class="practice-header">
+                                <label class="practice-check">
+                                    <input type="checkbox" class="practice-checkbox" data-practice="thursday">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <div class="practice-info">
+                                    <h3>Thursday - Practice "Good Enough"</h3>
+                                    <p>Do one task at 80% instead of 100%</p>
+                                </div>
+                                <button class="info-btn" data-practice="thursday">?</button>
+                            </div>
+                            <div class="why-section" id="why-thursday">
+                                <p>Perfectionism and anxiety are strongly linked - when standards are impossibly high, anxiety increases. CBT for perfectionism shows moderate effect sizes in reducing both perfectionism and anxiety symptoms. This exercise uses exposure therapy principles: practicing imperfection in low-stakes situations helps you learn that "good enough" rarely leads to the catastrophic outcomes perfectionism predicts.</p>
+                            </div>
+                            <input type="text" class="practice-note" data-practice="thursday" placeholder="Notes (optional)" maxlength="200">
+                        </div>
+
+                        <div class="practice-item" data-day="friday">
+                            <div class="practice-header">
+                                <label class="practice-check">
+                                    <input type="checkbox" class="practice-checkbox" data-practice="friday">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <div class="practice-info">
+                                    <h3>Friday - No Automatic Yes</h3>
+                                    <p>Pause 10 seconds before responding to requests, say no to one thing</p>
+                                </div>
+                                <button class="info-btn" data-practice="friday">?</button>
+                            </div>
+                            <div class="why-section" id="why-friday">
+                                <p>Overfunctioners often respond immediately to requests without checking their own capacity. Research on decision-making shows that even brief pauses improve the quality of choices. This practice creates space to assess whether a request aligns with your boundaries and capacity before automatically agreeing.</p>
+                            </div>
+                            <input type="text" class="practice-note" data-practice="friday" placeholder="Notes (optional)" maxlength="200">
+                        </div>
+
+                        <div class="practice-item" data-day="weekend">
+                            <div class="practice-header">
+                                <label class="practice-check">
+                                    <input type="checkbox" class="practice-checkbox" data-practice="weekend">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <div class="practice-info">
+                                    <h3>Weekend - Rest Without Earning It</h3>
+                                    <p>Do something restful without completing your to-do list first</p>
+                                </div>
+                                <button class="info-btn" data-practice="weekend">?</button>
+                            </div>
+                            <div class="why-section" id="why-weekend">
+                                <p>Overfunctioners often believe rest must be "earned" through productivity. This reflects perfectionistic thinking that links self-worth to achievement. Research on self-compassion shows that treating yourself with kindness (rather than constantly striving) improves mental health outcomes. This practice challenges the belief that your value depends on constant doing.</p>
+                            </div>
+                            <input type="text" class="practice-note" data-practice="weekend" placeholder="Notes (optional)" maxlength="200">
+                        </div>
+
+                        <button class="save-practices-btn" id="save-practices">Save Practices</button>
+
+                        <div class="disclaimer">
+                            <p>This program is based on established therapeutic principles from Cognitive Behavioral Therapy (CBT), family systems theory, and mindfulness-based approaches. While the underlying concepts are research-supported, this specific weekly structure has not been tested in clinical trials. Think of it as applying proven principles to your particular situation. If you need clinical support, please consult a licensed therapist.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patterns View -->
+        <div id="patterns-view" class="view">
+            <div class="view-content">
+                <h2 class="view-title">Patterns</h2>
+
+                <div class="week-nav">
+                    <button id="prev-week" class="week-nav-btn">&#x2190;</button>
+                    <span id="week-label">This Week</span>
+                    <button id="next-week" class="week-nav-btn">&#x2192;</button>
+                </div>
+
+                <div class="calendar-grid" id="calendar-grid">
+                    <!-- Calendar days will be rendered here -->
+                </div>
+
+                <div class="week-summary" id="week-summary">
+                    <!-- Summary will be rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- History View -->
+        <div id="history-view" class="view">
+            <div class="view-content">
+                <h2 class="view-title">History</h2>
+
+                <div class="history-filters">
+                    <select id="history-filter">
+                        <option value="7">Last 7 days</option>
+                        <option value="30">Last 30 days</option>
+                        <option value="all">All time</option>
+                    </select>
+                    <input type="text" id="history-search" placeholder="Search notes...">
+                </div>
+
+                <div class="history-list" id="history-list">
+                    <!-- History items will be rendered here -->
+                </div>
+
+                <div class="export-section">
+                    <button class="export-btn" id="export-json">Export Encrypted JSON</button>
+                    <button class="export-btn" id="export-csv">Export Plain CSV</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings View -->
+        <div id="settings-view" class="view">
+            <div class="view-content">
+                <h2 class="view-title">Settings</h2>
+
+                <div class="settings-section">
+                    <h3>Notifications</h3>
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <span>Daily reminder</span>
+                            <input type="checkbox" id="notification-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item" id="notification-time-setting" style="display: none;">
+                        <label>Reminder time</label>
+                        <input type="time" id="notification-time" value="20:00">
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Security</h3>
+                    <button class="settings-btn" id="change-pin">Change PIN</button>
+                    <button class="settings-btn" id="export-backup">Export Encrypted Backup</button>
+                    <button class="settings-btn" id="import-backup">Import Backup</button>
+                    <input type="file" id="import-file" accept=".json" style="display: none;">
+                </div>
+
+                <div class="settings-section">
+                    <h3>Data</h3>
+                    <button class="settings-btn danger" id="clear-data">Clear All Data</button>
+                </div>
+
+                <div class="settings-section">
+                    <p class="app-info">Step Back v1.0</p>
+                    <p class="app-info">Data stored locally on this device</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Entry Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <h3>Edit Entry</h3>
+            <p class="modal-date" id="edit-date"></p>
+            <div class="modal-body">
+                <div class="checkin-buttons modal-buttons">
+                    <button class="checkin-btn yes-btn" id="modal-yes">Yes</button>
+                    <button class="checkin-btn no-btn" id="modal-no">No</button>
+                </div>
+                <input type="text" id="modal-note" placeholder="Quick note (optional)" maxlength="100">
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="modal-cancel">Cancel</button>
+                <button class="modal-btn save" id="modal-save">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="confirm-title">Confirm</h3>
+            <p id="confirm-message"></p>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="confirm-cancel">Cancel</button>
+                <button class="modal-btn danger" id="confirm-ok">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change PIN Modal -->
+    <div id="pin-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="pin-modal-title">Change PIN</h3>
+            <p id="pin-modal-message">Enter current PIN</p>
+            <div class="pin-display small">
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+            </div>
+            <div class="pin-pad small">
+                <button class="pin-btn" data-num="1">1</button>
+                <button class="pin-btn" data-num="2">2</button>
+                <button class="pin-btn" data-num="3">3</button>
+                <button class="pin-btn" data-num="4">4</button>
+                <button class="pin-btn" data-num="5">5</button>
+                <button class="pin-btn" data-num="6">6</button>
+                <button class="pin-btn" data-num="7">7</button>
+                <button class="pin-btn" data-num="8">8</button>
+                <button class="pin-btn" data-num="9">9</button>
+                <button class="pin-btn" data-num="clear">&#x232B;</button>
+                <button class="pin-btn" data-num="0">0</button>
+                <button class="pin-btn" data-num="enter">&#x2192;</button>
+            </div>
+            <button class="modal-btn cancel pin-cancel" id="pin-modal-cancel">Cancel</button>
+        </div>
+    </div>
+
+    <script src="crypto.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
