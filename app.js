@@ -898,56 +898,15 @@ const App = {
         setTimeout(() => toast.classList.remove('visible'), 2500);
     },
 
-    // Service Worker
+    // Service Worker (required for PWA install, but no caching)
     async registerServiceWorker() {
         if ('serviceWorker' in navigator) {
             try {
-                const registration = await navigator.serviceWorker.register('sw.js');
-                console.log('ServiceWorker registered:', registration.scope);
-
-                // Check for updates
-                registration.addEventListener('updatefound', () => {
-                    const newWorker = registration.installing;
-
-                    newWorker.addEventListener('statechange', () => {
-                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            // New version available
-                            this.showUpdateBanner(newWorker);
-                        }
-                    });
-                });
-
-                // Handle controller change (when new SW takes over)
-                navigator.serviceWorker.addEventListener('controllerchange', () => {
-                    window.location.reload();
-                });
-
+                await navigator.serviceWorker.register('sw.js');
             } catch (error) {
                 console.log('ServiceWorker registration failed:', error);
             }
         }
-    },
-
-    showUpdateBanner(worker) {
-        // Create update banner
-        let banner = document.getElementById('update-banner');
-        if (!banner) {
-            banner = document.createElement('div');
-            banner.id = 'update-banner';
-            banner.innerHTML = `
-                <span>New version available</span>
-                <button id="update-btn">Update</button>
-            `;
-            document.body.appendChild(banner);
-
-            document.getElementById('update-btn').addEventListener('click', () => {
-                banner.classList.remove('visible');
-                worker.postMessage({ type: 'SKIP_WAITING' });
-            });
-        }
-
-        // Show with slight delay
-        setTimeout(() => banner.classList.add('visible'), 500);
     }
 };
 
