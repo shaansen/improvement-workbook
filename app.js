@@ -7,7 +7,7 @@ const App = {
         notificationEnabled: false,
         notificationTime: '20:00'
     },
-    currentWeekOffset: 0,
+    currentMonthOffset: 0,
     editingEntryDate: null,
 
     // Initialize the app
@@ -103,14 +103,14 @@ const App = {
         // Save practices
         document.getElementById('save-practices').addEventListener('click', () => this.savePractices());
 
-        // Week navigation
-        document.getElementById('prev-week').addEventListener('click', () => {
-            this.currentWeekOffset--;
+        // Month navigation
+        document.getElementById('prev-month').addEventListener('click', () => {
+            this.currentMonthOffset--;
             this.renderPatterns();
         });
-        document.getElementById('next-week').addEventListener('click', () => {
-            if (this.currentWeekOffset < 0) {
-                this.currentWeekOffset++;
+        document.getElementById('next-month').addEventListener('click', () => {
+            if (this.currentMonthOffset < 0) {
+                this.currentMonthOffset++;
                 this.renderPatterns();
             }
         });
@@ -447,26 +447,25 @@ const App = {
         const grid = document.getElementById('calendar-grid');
         grid.innerHTML = '';
 
-        // Get week dates
         const today = new Date();
-        const startOfWeek = new Date(today);
-        startOfWeek.setDate(today.getDate() - today.getDay() + (this.currentWeekOffset * 7));
 
-        // Week label
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        // Get the month to display
+        const displayDate = new Date(today.getFullYear(), today.getMonth() + this.currentMonthOffset, 1);
+        const year = displayDate.getFullYear();
+        const month = displayDate.getMonth();
 
-        if (this.currentWeekOffset === 0) {
-            document.getElementById('week-label').textContent = 'This Week';
-        } else if (this.currentWeekOffset === -1) {
-            document.getElementById('week-label').textContent = 'Last Week';
-        } else {
-            document.getElementById('week-label').textContent =
-                `${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
-        }
+        // First day of month and number of days
+        const firstDayOfMonth = new Date(year, month, 1);
+        const lastDayOfMonth = new Date(year, month + 1, 0);
+        const daysInMonth = lastDayOfMonth.getDate();
+        const startingDayOfWeek = firstDayOfMonth.getDay();
 
-        // Disable next button if at current week
-        document.getElementById('next-week').disabled = this.currentWeekOffset >= 0;
+        // Month label
+        const monthName = displayDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        document.getElementById('month-label').textContent = monthName;
+
+        // Disable next button if at current month
+        document.getElementById('next-month').disabled = this.currentMonthOffset >= 0;
 
         // Day headers
         const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -477,11 +476,19 @@ const App = {
             grid.appendChild(header);
         });
 
-        // Days
+        // Empty cells before first day
+        for (let i = 0; i < startingDayOfWeek; i++) {
+            const emptyEl = document.createElement('div');
+            emptyEl.className = 'calendar-day empty';
+            grid.appendChild(emptyEl);
+        }
+
+        // Days of the month
         let checkinCount = 0;
-        for (let i = 0; i < 7; i++) {
-            const date = new Date(startOfWeek);
-            date.setDate(startOfWeek.getDate() + i);
+        let totalDaysUpToToday = 0;
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
             const dateStr = this.formatDate(date);
             const entry = this.entries.find(e => e.date === dateStr);
 
@@ -494,17 +501,21 @@ const App = {
             if (isToday) dayEl.classList.add('today');
             if (isFuture) dayEl.classList.add('future');
 
+            if (!isFuture) {
+                totalDaysUpToToday++;
+            }
+
             if (entry && entry.steppedBack !== null) {
                 dayEl.classList.add(entry.steppedBack ? 'yes' : 'no');
-                checkinCount++;
+                if (!isFuture) checkinCount++;
             }
 
             dayEl.innerHTML = `
-                <span class="day-num">${date.getDate()}</span>
+                <span class="day-num">${day}</span>
                 <span class="day-status">${entry && entry.steppedBack !== null ? (entry.steppedBack ? '&#10003;' : '&#8212;') : ''}</span>
             `;
 
-            if (!isFuture && entry) {
+            if (!isFuture) {
                 dayEl.addEventListener('click', () => this.openEditModal(dateStr));
             }
 
@@ -512,9 +523,11 @@ const App = {
         }
 
         // Summary
-        document.getElementById('week-summary').innerHTML = `
-            <p>You checked in ${checkinCount} out of 7 days this week</p>
-        `;
+        const summaryText = this.currentMonthOffset === 0
+            ? `You checked in ${checkinCount} out of ${totalDaysUpToToday} days this month`
+            : `You checked in ${checkinCount} out of ${daysInMonth} days`;
+
+        document.getElementById('month-summary').innerHTML = `<p>${summaryText}</p>`;
     },
 
     // History view
