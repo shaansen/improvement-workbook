@@ -1,6 +1,6 @@
 // Step Back - Service Worker
 
-const CACHE_NAME = 'stepback-v1';
+const CACHE_NAME = 'stepback-v2';
 const ASSETS = [
     './',
     './index.html',
@@ -21,8 +21,8 @@ self.addEventListener('install', (event) => {
                 console.log('Caching app assets');
                 return cache.addAll(ASSETS);
             })
-            .then(() => self.skipWaiting())
     );
+    // Don't skipWaiting here - we want to wait for user confirmation
 });
 
 // Activate event - clean up old caches
@@ -38,6 +38,13 @@ self.addEventListener('activate', (event) => {
             })
             .then(() => self.clients.claim())
     );
+});
+
+// Listen for skip waiting message from client
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 });
 
 // Fetch event - serve from cache, fallback to network
@@ -77,27 +84,6 @@ self.addEventListener('fetch', (event) => {
                 // Offline fallback for navigation requests
                 if (event.request.mode === 'navigate') {
                     return caches.match('./index.html');
-                }
-            })
-    );
-});
-
-// Handle notification clicks
-self.addEventListener('notificationclick', (event) => {
-    event.notification.close();
-
-    event.waitUntil(
-        clients.matchAll({ type: 'window', includeUncontrolled: true })
-            .then((clientList) => {
-                // Focus existing window if available
-                for (const client of clientList) {
-                    if (client.url.includes('step-back') && 'focus' in client) {
-                        return client.focus();
-                    }
-                }
-                // Open new window if no existing window
-                if (clients.openWindow) {
-                    return clients.openWindow('./');
                 }
             })
     );
