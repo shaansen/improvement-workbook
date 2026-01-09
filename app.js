@@ -392,6 +392,15 @@ const App = {
         });
     },
 
+    formatTime(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+    },
+
     getTodayEntry() {
         const today = this.formatDate(new Date());
         return this.entries.find(e => e.date === today);
@@ -625,9 +634,14 @@ const App = {
                 .filter(k => !k.endsWith('_note') && entry.practices[k])
                 .map(k => this.getPracticeLabel(k)) : [];
 
+            const timeStr = entry.timestamp ? this.formatTime(entry.timestamp) : '';
+
             return `
                 <div class="history-item" data-date="${entry.date}">
-                    <div class="history-date">${this.formatDisplayDate(entry.date)}</div>
+                    <div class="history-header">
+                        <span class="history-date">${this.formatDisplayDate(entry.date)}</span>
+                        ${timeStr ? `<span class="history-time">${timeStr}</span>` : ''}
+                    </div>
                     <div class="history-response ${entry.steppedBack ? 'yes' : 'no'}">
                         ${entry.steppedBack === null ? 'No check-in' : (entry.steppedBack ? '&#10003; Stepped back' : '&#8212; Did not step back')}
                     </div>

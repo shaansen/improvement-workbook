@@ -843,11 +843,23 @@ body {
     opacity: 0.9;
 }
 
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
 .history-date {
     font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.history-time {
+    font-size: 12px;
     font-weight: 500;
     color: var(--text-muted);
-    margin-bottom: 8px;
 }
 
 .history-response {
