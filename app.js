@@ -3,12 +3,76 @@
 const App = {
     currentPin: null,
     entries: [],
-    settings: {
-        notificationEnabled: false,
-        notificationTime: '20:00'
-    },
+    settings: {},
     currentMonthOffset: 0,
     editingEntryDate: null,
+
+    // Daily practices data
+    practices: {
+        0: { // Sunday
+            key: 'weekend',
+            title: 'Weekend - Rest Without Earning It',
+            desc: 'Do something restful without completing your to-do list first',
+            examples: [
+                'Watch a show or nap while dishes are in the sink or laundry is unfolded',
+                'Say "I\'m resting today" without justifying it with how hard you worked'
+            ]
+        },
+        1: { // Monday
+            key: 'monday',
+            title: 'Monday - Pause Practice',
+            desc: 'Set 3 reminders to notice overfunctioning moments',
+            examples: [
+                'You start rewriting a coworker\'s email "to help" before they even ask',
+                'You jump in to explain something for someone mid-sentence'
+            ]
+        },
+        2: { // Tuesday
+            key: 'tuesday',
+            title: 'Tuesday - "Not My Circus"',
+            desc: 'Practice letting someone else handle their own responsibility',
+            examples: [
+                'A friend complains about a problem - listen without offering solutions',
+                'A family member is running late for their appointment - resist reminding them'
+            ]
+        },
+        3: { // Wednesday
+            key: 'wednesday',
+            title: 'Wednesday - Schedule Personal Time',
+            desc: 'Block 30 minutes for something you want (non-negotiable)',
+            examples: [
+                'Block 30 min labeled "busy" - walk, read, or do nothing',
+                'Take a full lunch break away from your desk without checking messages'
+            ]
+        },
+        4: { // Thursday
+            key: 'thursday',
+            title: 'Thursday - Practice "Good Enough"',
+            desc: 'Do one task at 80% instead of 100%',
+            examples: [
+                'Send an email without re-reading it 3 times - one quick proof and send',
+                'Leave a room 80% tidy, or submit work without one final polish pass'
+            ]
+        },
+        5: { // Friday
+            key: 'friday',
+            title: 'Friday - No Automatic Yes',
+            desc: 'Pause 10 seconds before responding to requests, say no to one thing',
+            examples: [
+                '"Can you help with X?" → "Let me check and get back to you"',
+                'Decline one optional meeting, social invite, or favor'
+            ]
+        },
+        6: { // Saturday
+            key: 'weekend',
+            title: 'Weekend - Rest Without Earning It',
+            desc: 'Do something restful without completing your to-do list first',
+            examples: [
+                'Watch a show or nap while dishes are in the sink or laundry is unfolded',
+                'Say "I\'m resting today" without justifying it with how hard you worked'
+            ]
+        }
+    },
 
     // Initialize the app
     async init() {
@@ -124,20 +188,6 @@ const App = {
         document.getElementById('export-csv').addEventListener('click', () => this.exportCSV());
 
         // Settings
-        document.getElementById('notification-toggle').addEventListener('change', (e) => {
-            this.settings.notificationEnabled = e.target.checked;
-            document.getElementById('notification-time-setting').style.display =
-                e.target.checked ? 'block' : 'none';
-            this.saveSettings();
-            if (e.target.checked) this.requestNotificationPermission();
-        });
-
-        document.getElementById('notification-time').addEventListener('change', (e) => {
-            this.settings.notificationTime = e.target.value;
-            this.saveSettings();
-            this.scheduleNotification();
-        });
-
         document.getElementById('change-pin').addEventListener('click', () => this.openPinChangeModal());
         document.getElementById('export-backup').addEventListener('click', () => this.exportBackup());
         document.getElementById('import-backup').addEventListener('click', () => {
@@ -321,10 +371,6 @@ const App = {
         const settings = localStorage.getItem('stepback_settings');
         if (settings) {
             this.settings = JSON.parse(settings);
-            document.getElementById('notification-toggle').checked = this.settings.notificationEnabled;
-            document.getElementById('notification-time').value = this.settings.notificationTime;
-            document.getElementById('notification-time-setting').style.display =
-                this.settings.notificationEnabled ? 'block' : 'none';
         }
     },
 
@@ -375,6 +421,18 @@ const App = {
             // Reset practices
             this.resetPractices();
         }
+
+        // Show today's practice
+        this.renderTodaysPractice(today.getDay());
+    },
+
+    renderTodaysPractice(dayOfWeek) {
+        const practice = this.practices[dayOfWeek];
+        document.getElementById('todays-practice-title').textContent = practice.title;
+        document.getElementById('todays-practice-desc').textContent = practice.desc;
+
+        const examplesList = document.getElementById('todays-examples-list');
+        examplesList.innerHTML = practice.examples.map(ex => `<li>${ex}</li>`).join('');
     },
 
     async doCheckin(steppedBack) {
@@ -838,20 +896,6 @@ const App = {
         toast.textContent = message;
         toast.classList.add('visible');
         setTimeout(() => toast.classList.remove('visible'), 2500);
-    },
-
-    // Notifications
-    async requestNotificationPermission() {
-        if ('Notification' in window && Notification.permission === 'default') {
-            await Notification.requestPermission();
-        }
-    },
-
-    scheduleNotification() {
-        // Note: For PWAs, notification scheduling is limited
-        // This would require a service worker with periodic sync or push notifications
-        // For now, we'll just store the preference
-        console.log('Notification scheduled for', this.settings.notificationTime);
     },
 
     // Service Worker

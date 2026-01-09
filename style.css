@@ -16,8 +16,8 @@
 
     --yes-color: #7eb8a2;
     --yes-bg: #e8f4ef;
-    --no-color: #8899a6;
-    --no-bg: #f0f3f5;
+    --no-color: #c08080;
+    --no-bg: #f8f0f0;
 
     --border-color: #dce4e8;
     --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -525,29 +525,58 @@ body {
     line-height: 1.6;
 }
 
-.examples-section {
-    margin-top: 12px;
+/* Today's Practice */
+.todays-practice {
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+    box-shadow: var(--shadow-soft);
+}
+
+.todays-practice h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent-calm);
+    margin-bottom: 6px;
+}
+
+.todays-practice > p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.todays-practice .examples-section {
+    margin-top: 0;
     padding-top: 12px;
     border-top: 1px solid var(--border-color);
 }
 
+/* Examples Section */
+.examples-section {
+    margin-top: 10px;
+    margin-left: 34px;
+}
+
 .examples-section strong {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.3px;
 }
 
 .examples-section ul {
-    margin: 8px 0 0 0;
-    padding-left: 18px;
+    margin: 6px 0 0 0;
+    padding-left: 16px;
 }
 
 .examples-section li {
     font-size: 13px;
     color: var(--text-secondary);
-    line-height: 1.5;
-    margin-bottom: 6px;
+    line-height: 1.4;
+    margin-bottom: 4px;
 }
 
 .examples-section li:last-child {
@@ -995,6 +1024,22 @@ body {
 
 .modal-body {
     margin-bottom: 20px;
+}
+
+.modal-body input[type="text"] {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 15px;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    min-height: 60px;
+}
+
+.modal-body input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent-soft);
 }
 
 .modal-buttons {
