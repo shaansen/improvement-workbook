@@ -2,25 +2,37 @@
 
 :root {
     /* Calm color palette */
-    --bg-primary: #f7f9fa;
+    --bg-primary: #f8f9fb;
     --bg-secondary: #ffffff;
-    --bg-tertiary: #eef2f5;
+    --bg-tertiary: #f0f2f5;
 
-    --text-primary: #2c3e50;
-    --text-secondary: #5a6c7d;
+    --text-primary: #1a2b3c;
+    --text-secondary: #4a5e6d;
     --text-muted: #8899a6;
 
-    --accent-calm: #5a7d8c;
-    --accent-soft: #7ba3b0;
-    --accent-light: #c4d8de;
+    --accent-calm: #4a7c8c;
+    --accent-soft: #6b9daf;
+    --accent-light: #d4e5eb;
 
-    --yes-color: #7eb8a2;
-    --yes-bg: #e8f4ef;
-    --no-color: #c08080;
-    --no-bg: #f8f0f0;
+    /* Button colors - clear distinction */
+    --yes-color: #22a06b;
+    --yes-color-dark: #1b8a58;
+    --yes-bg: #dcfff1;
+    --yes-border: #22a06b;
 
-    --border-color: #dce4e8;
+    --no-color: #cf5b5b;
+    --no-color-dark: #b84c4c;
+    --no-bg: #fff0f0;
+    --no-border: #cf5b5b;
+
+    /* Unselected button */
+    --btn-unselected-bg: #ffffff;
+    --btn-unselected-border: #d0d7de;
+    --btn-unselected-text: #4a5e6d;
+
+    --border-color: #d8dee4;
     --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-btn: 0 1px 3px rgba(0, 0, 0, 0.08);
 
     --safe-top: env(safe-area-inset-top);
     --safe-bottom: env(safe-area-inset-bottom);
@@ -41,11 +53,13 @@ html, body {
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
     line-height: 1.5;
     font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* Screens */
@@ -271,38 +285,74 @@ body {
 
 .checkin-btn {
     flex: 1;
-    max-width: 140px;
-    padding: 16px 24px;
+    max-width: 150px;
+    padding: 18px 24px;
     border-radius: 12px;
-    border: none;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 600;
     cursor: pointer;
-    transition: transform 0.1s, box-shadow 0.1s;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    /* Default: unselected state - outline style */
+    background: var(--btn-unselected-bg);
+    border: 2px solid var(--btn-unselected-border);
+    color: var(--btn-unselected-text);
+    box-shadow: var(--shadow-btn);
 }
 
 .checkin-btn:active {
     transform: scale(0.97);
 }
 
+/* Yes button - unselected */
 .yes-btn {
-    background: var(--yes-bg);
+    border-color: var(--yes-color);
     color: var(--yes-color);
 }
 
-.yes-btn.selected {
-    background: var(--yes-color);
-    color: white;
+.yes-btn:hover {
+    background: var(--yes-bg);
 }
 
+/* Yes button - selected: filled green with checkmark */
+.yes-btn.selected {
+    background: var(--yes-color);
+    border-color: var(--yes-color);
+    color: white;
+    box-shadow: 0 2px 8px rgba(34, 160, 107, 0.3);
+}
+
+.yes-btn.selected::before {
+    content: '\2713';
+    font-size: 16px;
+    font-weight: 700;
+}
+
+/* No button - unselected */
 .no-btn {
-    background: var(--no-bg);
+    border-color: var(--no-color);
     color: var(--no-color);
 }
 
+.no-btn:hover {
+    background: var(--no-bg);
+}
+
+/* No button - selected: filled red with X */
 .no-btn.selected {
     background: var(--no-color);
+    border-color: var(--no-color);
     color: white;
+    box-shadow: 0 2px 8px rgba(207, 91, 91, 0.3);
+}
+
+.no-btn.selected::before {
+    content: '\2717';
+    font-size: 16px;
+    font-weight: 700;
 }
 
 .note-section {
@@ -716,8 +766,18 @@ body {
     background: var(--yes-bg);
 }
 
+.calendar-day.yes .day-status {
+    color: var(--yes-color);
+    font-weight: 600;
+}
+
 .calendar-day.no {
     background: var(--no-bg);
+}
+
+.calendar-day.no .day-status {
+    color: var(--no-color);
+    font-weight: 600;
 }
 
 .calendar-day.future {
