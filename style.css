@@ -525,6 +525,35 @@ body {
     line-height: 1.6;
 }
 
+.examples-section {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+}
+
+.examples-section strong {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.examples-section ul {
+    margin: 8px 0 0 0;
+    padding-left: 18px;
+}
+
+.examples-section li {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 6px;
+}
+
+.examples-section li:last-child {
+    margin-bottom: 0;
+}
+
 .practice-note {
     width: calc(100% - 34px);
     margin-left: 34px;
