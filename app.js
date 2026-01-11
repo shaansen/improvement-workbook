@@ -195,6 +195,7 @@ const App = {
         });
         document.getElementById('import-file').addEventListener('change', (e) => this.importBackup(e));
         document.getElementById('clear-data').addEventListener('click', () => this.confirmClearData());
+        document.getElementById('refresh-app').addEventListener('click', () => this.refreshApp());
 
         // Edit modal
         document.getElementById('modal-yes').addEventListener('click', () => {
@@ -924,6 +925,36 @@ const App = {
             } catch (error) {
                 console.log('ServiceWorker registration failed:', error);
             }
+        }
+    },
+
+    // Force refresh the app to get latest version
+    async refreshApp() {
+        this.showToast('Refreshing app...');
+
+        try {
+            // Unregister all service workers
+            if ('serviceWorker' in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (const registration of registrations) {
+                    await registration.unregister();
+                }
+            }
+
+            // Clear all caches
+            if ('caches' in window) {
+                const cacheNames = await caches.keys();
+                for (const name of cacheNames) {
+                    await caches.delete(name);
+                }
+            }
+
+            // Hard reload the page (bypass cache)
+            window.location.reload(true);
+        } catch (error) {
+            console.log('Refresh error:', error);
+            // Fall back to regular reload
+            window.location.reload(true);
         }
     }
 };

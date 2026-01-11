@@ -1043,6 +1043,13 @@ body {
     border-color: #c75050;
 }
 
+.setting-hint {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: -6px;
+    margin-bottom: 0;
+}
+
 .app-info {
     font-size: 13px;
     color: var(--text-muted);
