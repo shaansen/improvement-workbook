@@ -248,6 +248,40 @@ body {
     margin-bottom: 20px;
 }
 
+/* Track Selector */
+.track-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    background: var(--bg-secondary);
+    padding: 6px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft);
+}
+
+.track-btn {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.track-btn:hover {
+    color: var(--text-secondary);
+}
+
+.track-btn.active {
+    background: var(--accent-calm);
+    color: white;
+    box-shadow: 0 2px 6px rgba(74, 124, 140, 0.3);
+}
+
 /* Check-in View */
 .checkin-header {
     text-align: center;

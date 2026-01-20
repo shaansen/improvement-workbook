@@ -6,9 +6,95 @@ const App = {
     settings: {},
     currentMonthOffset: 0,
     editingEntryDate: null,
+    currentTrack: 'overfunctioning', // 'overfunctioning' or 'avoidant'
 
-    // Daily practices data
-    practices: {
+    // Track definitions
+    tracks: {
+        overfunctioning: {
+            name: 'Overfunctioning',
+            question: 'Did you practice stepping back today?',
+            yesLabel: 'Stepped back',
+            noLabel: 'Did not step back',
+            description: 'Track progress on stepping back from overfunctioning patterns'
+        },
+        avoidant: {
+            name: 'Fearful-Avoidant',
+            question: 'Did you practice staying present today?',
+            yesLabel: 'Stayed present',
+            noLabel: 'Did not stay present',
+            description: 'Track progress on staying present in relationships despite fear'
+        }
+    },
+
+    // Fearful-Avoidant attachment practices (for committed relationship)
+    avoidantPractices: {
+        0: { // Sunday
+            key: 'weekend',
+            title: 'Weekend - Self-Soothing Practice',
+            desc: 'Calm your nervous system when activated, without seeking reassurance or withdrawing from Charlie',
+            examples: [
+                'When feeling anxious, use grounding (5 senses, deep breathing) before bringing it to Charlie',
+                'Journal about what you\'re feeling first - distinguish old wounds from current reality'
+            ]
+        },
+        1: { // Monday
+            key: 'monday',
+            title: 'Monday - Notice the Urge to Withdraw',
+            desc: 'When you feel the pull to create distance from Charlie, pause and name the trigger',
+            examples: [
+                'Charlie says something loving → you feel urge to pick a fight or go cold. Pause. Name it: "I\'m feeling vulnerable"',
+                'After closeness, you want space. Notice: "Intimacy is activating my nervous system, not a real threat"'
+            ]
+        },
+        2: { // Tuesday
+            key: 'tuesday',
+            title: 'Tuesday - Stay 10% Longer',
+            desc: 'When closeness with Charlie feels uncomfortable, stay slightly longer instead of escaping',
+            examples: [
+                'During a vulnerable conversation, resist the urge to change the subject or make a joke',
+                'When Charlie shows affection, stay present for a few more seconds instead of pulling away or deflecting'
+            ]
+        },
+        3: { // Wednesday
+            key: 'wednesday',
+            title: 'Wednesday - Ask Directly (No Testing)',
+            desc: 'Express a need to Charlie clearly instead of hinting, testing, or expecting mind-reading',
+            examples: [
+                'Instead of withdrawing to see if Charlie chases you, say "I need some reassurance right now"',
+                'Replace "It\'s fine, do whatever you want" with "I\'d really like it if we spent time together tonight"'
+            ]
+        },
+        4: { // Thursday
+            key: 'thursday',
+            title: 'Thursday - Reality-Check the Threat',
+            desc: 'When triggered, ask: "Is this about Charlie now, or am I reacting to an old wound?"',
+            examples: [
+                'Charlie seems distant → Before assuming rejection, ask: "Could something else be going on for them?"',
+                'You feel criticized → Pause: "Is Charlie actually attacking me, or am I hearing my past?"'
+            ]
+        },
+        5: { // Friday
+            key: 'friday',
+            title: 'Friday - Receive Without Sabotaging',
+            desc: 'When Charlie shows love, let it in without deflecting, dismissing, or creating conflict',
+            examples: [
+                'Charlie compliments you → Say "thank you, that means a lot" and sit with it, don\'t undermine it',
+                'Charlie plans something special → Receive it without finding flaws or pushing them away'
+            ]
+        },
+        6: { // Saturday
+            key: 'weekend',
+            title: 'Weekend - Self-Soothing Practice',
+            desc: 'Calm your nervous system when activated, without seeking reassurance or withdrawing from Charlie',
+            examples: [
+                'When feeling anxious, use grounding (5 senses, deep breathing) before bringing it to Charlie',
+                'Journal about what you\'re feeling first - distinguish old wounds from current reality'
+            ]
+        }
+    },
+
+    // Overfunctioning practices (original)
+    overfunctioningPractices: {
         0: { // Sunday
             key: 'weekend',
             title: 'Weekend - Rest Without Earning It',
@@ -74,11 +160,58 @@ const App = {
         }
     },
 
+    // Get practices for current track
+    get practices() {
+        return this.currentTrack === 'avoidant' ? this.avoidantPractices : this.overfunctioningPractices;
+    },
+
     // Initialize the app
     async init() {
+        this.loadTrack();
         this.bindEvents();
         await this.checkSetup();
         this.registerServiceWorker();
+    },
+
+    // Load saved track preference
+    loadTrack() {
+        const saved = localStorage.getItem('stepback_track');
+        if (saved && this.tracks[saved]) {
+            this.currentTrack = saved;
+        }
+        this.updateTrackUI();
+    },
+
+    // Save track preference
+    saveTrack() {
+        localStorage.setItem('stepback_track', this.currentTrack);
+    },
+
+    // Switch track
+    switchTrack(track) {
+        if (this.tracks[track]) {
+            this.currentTrack = track;
+            this.saveTrack();
+            this.updateTrackUI();
+            this.renderCheckin();
+        }
+    },
+
+    // Update UI elements based on current track
+    updateTrackUI() {
+        // Update track selector buttons
+        document.querySelectorAll('.track-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.track === this.currentTrack);
+        });
+
+        // Update track-specific content visibility
+        const isAvoidant = this.currentTrack === 'avoidant';
+        document.querySelectorAll('.overfunctioning-content').forEach(el => {
+            el.style.display = isAvoidant ? 'none' : 'block';
+        });
+        document.querySelectorAll('.avoidant-content').forEach(el => {
+            el.style.display = isAvoidant ? 'block' : 'none';
+        });
     },
 
     // Check if app is set up
@@ -125,6 +258,13 @@ const App = {
             }
         });
 
+        // Track switcher
+        document.querySelectorAll('.track-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.switchTrack(btn.dataset.track);
+            });
+        });
+
         // Navigation
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -160,7 +300,9 @@ const App = {
             btn.addEventListener('click', () => {
                 const practice = btn.dataset.practice;
                 const whySection = document.getElementById('why-' + practice);
-                whySection.classList.toggle('visible');
+                if (whySection) {
+                    whySection.classList.toggle('visible');
+                }
             });
         });
 
@@ -413,7 +555,12 @@ const App = {
 
     renderCheckin() {
         const today = new Date();
+        const track = this.tracks[this.currentTrack];
+
         document.getElementById('today-date').textContent = this.formatDisplayDate(this.formatDate(today));
+
+        // Update question based on track
+        document.getElementById('checkin-question').textContent = track.question;
 
         const todayEntry = this.getTodayEntry();
 
@@ -421,7 +568,7 @@ const App = {
             document.getElementById('quick-checkin').style.display = 'none';
             document.getElementById('checkin-done').style.display = 'block';
             document.getElementById('done-response').textContent =
-                todayEntry.steppedBack ? 'You stepped back today' : 'You did not step back today';
+                todayEntry.steppedBack ? track.yesLabel : track.noLabel;
             document.getElementById('done-note').textContent = todayEntry.note || '';
 
             // Load practices
@@ -438,6 +585,9 @@ const App = {
 
         // Show today's practice
         this.renderTodaysPractice(today.getDay());
+
+        // Update track UI
+        this.updateTrackUI();
     },
 
     renderTodaysPractice(dayOfWeek) {
@@ -634,12 +784,15 @@ const App = {
             return;
         }
 
+        const track = this.tracks[this.currentTrack];
         list.innerHTML = filtered.map(entry => {
             const practices = entry.practices ? Object.keys(entry.practices)
                 .filter(k => !k.endsWith('_note') && entry.practices[k])
                 .map(k => this.getPracticeLabel(k)) : [];
 
             const timeStr = entry.timestamp ? this.formatTime(entry.timestamp) : '';
+            const yesText = `&#10003; ${track.yesLabel}`;
+            const noText = `&#8212; ${track.noLabel}`;
 
             return `
                 <div class="history-item" data-date="${entry.date}">
@@ -648,7 +801,7 @@ const App = {
                         ${timeStr ? `<span class="history-time">${timeStr}</span>` : ''}
                     </div>
                     <div class="history-response ${entry.steppedBack ? 'yes' : 'no'}">
-                        ${entry.steppedBack === null ? 'No check-in' : (entry.steppedBack ? '&#10003; Stepped back' : '&#8212; Did not step back')}
+                        ${entry.steppedBack === null ? 'No check-in' : (entry.steppedBack ? yesText : noText)}
                     </div>
                     ${entry.note ? `<div class="history-note">"${entry.note}"</div>` : ''}
                     ${practices.length > 0 ? `
@@ -669,7 +822,7 @@ const App = {
     },
 
     getPracticeLabel(key) {
-        const labels = {
+        const overfunctioningLabels = {
             monday: 'Pause',
             tuesday: 'Not My Circus',
             wednesday: 'Personal Time',
@@ -677,6 +830,15 @@ const App = {
             friday: 'No Auto Yes',
             weekend: 'Rest'
         };
+        const avoidantLabels = {
+            monday: 'Notice Withdrawal',
+            tuesday: 'Stay Longer',
+            wednesday: 'Ask Directly',
+            thursday: 'Reality Check',
+            friday: 'Receive Care',
+            weekend: 'Self-Soothe'
+        };
+        const labels = this.currentTrack === 'avoidant' ? avoidantLabels : overfunctioningLabels;
         return labels[key] || key;
     },
 

@@ -111,12 +111,18 @@
         <!-- Check-in View -->
         <div id="checkin-view" class="view active">
             <div class="view-content">
+                <!-- Track Selector -->
+                <div class="track-selector">
+                    <button class="track-btn active" data-track="overfunctioning">Overfunctioning</button>
+                    <button class="track-btn" data-track="avoidant">Fearful-Avoidant</button>
+                </div>
+
                 <div class="checkin-header">
                     <p class="date-display" id="today-date"></p>
                 </div>
 
                 <div class="quick-checkin" id="quick-checkin">
-                    <h2>Did you practice stepping back today?</h2>
+                    <h2 id="checkin-question">Did you practice stepping back today?</h2>
                     <div class="checkin-buttons">
                         <button class="checkin-btn yes-btn" id="btn-yes">Yes</button>
                         <button class="checkin-btn no-btn" id="btn-no">No</button>
@@ -155,160 +161,316 @@
                     </button>
 
                     <div class="reflection-content" id="reflection-content">
-                        <div class="practice-item" data-day="monday">
-                            <div class="practice-header">
-                                <label class="practice-check">
-                                    <input type="checkbox" class="practice-checkbox" data-practice="monday">
-                                    <span class="checkmark"></span>
-                                </label>
-                                <div class="practice-info">
-                                    <h3>Monday - Pause Practice</h3>
-                                    <p>Set 3 reminders to notice overfunctioning moments</p>
+                        <!-- Overfunctioning Practices -->
+                        <div class="overfunctioning-content">
+                            <div class="practice-item" data-day="monday">
+                                <div class="practice-header">
+                                    <label class="practice-check">
+                                        <input type="checkbox" class="practice-checkbox" data-practice="monday">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <div class="practice-info">
+                                        <h3>Monday - Pause Practice</h3>
+                                        <p>Set 3 reminders to notice overfunctioning moments</p>
+                                    </div>
+                                    <button class="info-btn" data-practice="monday">?</button>
                                 </div>
-                                <button class="info-btn" data-practice="monday">?</button>
+                                <div class="examples-section">
+                                    <strong>Examples:</strong>
+                                    <ul>
+                                        <li>You start rewriting a coworker's email "to help" before they even ask</li>
+                                        <li>You jump in to explain something for someone mid-sentence because you think you'll say it better</li>
+                                    </ul>
+                                </div>
+                                <div class="why-section" id="why-monday">
+                                    <p>This practice builds metacognitive awareness - the ability to observe your automatic patterns. Research shows that mindfulness-based interventions help people modify automatic behaviors by creating space between trigger and response. While this specific "3 reminders" approach hasn't been tested in studies, it applies evidence-based principles of awareness training to overfunctioning patterns.</p>
+                                </div>
+                                <input type="text" class="practice-note" data-practice="monday" placeholder="Notes (optional)" maxlength="200">
                             </div>
-                            <div class="examples-section">
-                                <strong>Examples:</strong>
-                                <ul>
-                                    <li>You start rewriting a coworker's email "to help" before they even ask</li>
-                                    <li>You jump in to explain something for someone mid-sentence because you think you'll say it better</li>
-                                </ul>
+
+                            <div class="practice-item" data-day="tuesday">
+                                <div class="practice-header">
+                                    <label class="practice-check">
+                                        <input type="checkbox" class="practice-checkbox" data-practice="tuesday">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <div class="practice-info">
+                                        <h3>Tuesday - "Not My Circus"</h3>
+                                        <p>Practice letting someone else handle their own responsibility</p>
+                                    </div>
+                                    <button class="info-btn" data-practice="tuesday">?</button>
+                                </div>
+                                <div class="examples-section">
+                                    <strong>Examples:</strong>
+                                    <ul>
+                                        <li>A friend complains about a problem - listen without offering solutions or fixing it for them</li>
+                                        <li>A family member is running late for their own appointment - resist the urge to remind them</li>
+                                    </ul>
+                                </div>
+                                <div class="why-section" id="why-tuesday">
+                                    <p>Research shows that people who set and maintain boundaries report higher life satisfaction and lower anxiety. In family systems theory, overfunctioning and underfunctioning exist as reciprocal patterns - when you step back, others have space to step up. This practice applies boundary-setting principles specifically to overfunctioning dynamics.</p>
+                                </div>
+                                <input type="text" class="practice-note" data-practice="tuesday" placeholder="Notes (optional)" maxlength="200">
                             </div>
-                            <div class="why-section" id="why-monday">
-                                <p>This practice builds metacognitive awareness - the ability to observe your automatic patterns. Research shows that mindfulness-based interventions help people modify automatic behaviors by creating space between trigger and response. While this specific "3 reminders" approach hasn't been tested in studies, it applies evidence-based principles of awareness training to overfunctioning patterns.</p>
+
+                            <div class="practice-item" data-day="wednesday">
+                                <div class="practice-header">
+                                    <label class="practice-check">
+                                        <input type="checkbox" class="practice-checkbox" data-practice="wednesday">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <div class="practice-info">
+                                        <h3>Wednesday - Schedule Personal Time</h3>
+                                        <p>Block 30 minutes for something you want (non-negotiable)</p>
+                                    </div>
+                                    <button class="info-btn" data-practice="wednesday">?</button>
+                                </div>
+                                <div class="examples-section">
+                                    <strong>Examples:</strong>
+                                    <ul>
+                                        <li>Block 30 min labeled "busy" - walk, read, or do nothing, even if your to-do list isn't done</li>
+                                        <li>Take a full lunch break away from your desk without checking messages</li>
+                                    </ul>
+                                </div>
+                                <div class="why-section" id="why-wednesday">
+                                    <p>Chronic self-sacrifice and overcommitment are linked to burnout. Studies on boundary-setting show that protecting personal time reduces emotional exhaustion. This practice reverses the overfunctioner's typical pattern of attending to everyone else's needs before their own.</p>
+                                </div>
+                                <input type="text" class="practice-note" data-practice="wednesday" placeholder="Notes (optional)" maxlength="200">
                             </div>
-                            <input type="text" class="practice-note" data-practice="monday" placeholder="Notes (optional)" maxlength="200">
+
+                            <div class="practice-item" data-day="thursday">
+                                <div class="practice-header">
+                                    <label class="practice-check">
+                                        <input type="checkbox" class="practice-checkbox" data-practice="thursday">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <div class="practice-info">
+                                        <h3>Thursday - Practice "Good Enough"</h3>
+                                        <p>Do one task at 80% instead of 100%</p>
+                                    </div>
+                                    <button class="info-btn" data-practice="thursday">?</button>
+                                </div>
+                                <div class="examples-section">
+                                    <strong>Examples:</strong>
+                                    <ul>
+                                        <li>Send an email without re-reading it 3 times - one quick proof and send</li>
+                                        <li>Leave a room 80% tidy, or submit work without one final polish pass</li>
+                                    </ul>
+                                </div>
+                                <div class="why-section" id="why-thursday">
+                                    <p>Perfectionism and anxiety are strongly linked - when standards are impossibly high, anxiety increases. CBT for perfectionism shows moderate effect sizes in reducing both perfectionism and anxiety symptoms. This exercise uses exposure therapy principles: practicing imperfection in low-stakes situations helps you learn that "good enough" rarely leads to the catastrophic outcomes perfectionism predicts.</p>
+                                </div>
+                                <input type="text" class="practice-note" data-practice="thursday" placeholder="Notes (optional)" maxlength="200">
+                            </div>
+
+                            <div class="practice-item" data-day="friday">
+                                <div class="practice-header">
+                                    <label class="practice-check">
+                                        <input type="checkbox" class="practice-checkbox" data-practice="friday">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <div class="practice-info">
+                                        <h3>Friday - No Automatic Yes</h3>
+                                        <p>Pause 10 seconds before responding to requests, say no to one thing</p>
+                                    </div>
+                                    <button class="info-btn" data-practice="friday">?</button>
+                                </div>
+                                <div class="examples-section">
+                                    <strong>Examples:</strong>
+                                    <ul>
+                                        <li>"Can you help with X?" → "Let me check and get back to you" instead of instant yes</li>
+                                        <li>Decline one optional meeting, social invite, or favor - even a small one counts</li>
+                                    </ul>
+                                </div>
+                                <div class="why-section" id="why-friday">
+                                    <p>Overfunctioners often respond immediately to requests without checking their own capacity. Research on decision-making shows that even brief pauses improve the quality of choices. This practice creates space to assess whether a request aligns with your boundaries and capacity before automatically agreeing.</p>
+                                </div>
+                                <input type="text" class="practice-note" data-practice="friday" placeholder="Notes (optional)" maxlength="200">
+                            </div>
+
+                            <div class="practice-item" data-day="weekend">
+                                <div class="practice-header">
+                                    <label class="practice-check">
+                                        <input type="checkbox" class="practice-checkbox" data-practice="weekend">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <div class="practice-info">
+                                        <h3>Weekend - Rest Without Earning It</h3>
+                                        <p>Do something restful without completing your to-do list first</p>
+                                    </div>
+                                    <button class="info-btn" data-practice="weekend">?</button>
+                                </div>
+                                <div class="examples-section">
+                                    <strong>Examples:</strong>
+                                    <ul>
+                                        <li>Watch a show or nap while dishes are in the sink or laundry is unfolded</li>
+                                        <li>Say "I'm resting today" without justifying it with how hard you worked</li>
+                                    </ul>
+                                </div>
+                                <div class="why-section" id="why-weekend">
+                                    <p>Overfunctioners often believe rest must be "earned" through productivity. This reflects perfectionistic thinking that links self-worth to achievement. Research on self-compassion shows that treating yourself with kindness (rather than constantly striving) improves mental health outcomes. This practice challenges the belief that your value depends on constant doing.</p>
+                                </div>
+                                <input type="text" class="practice-note" data-practice="weekend" placeholder="Notes (optional)" maxlength="200">
+                            </div>
                         </div>
 
-                        <div class="practice-item" data-day="tuesday">
-                            <div class="practice-header">
-                                <label class="practice-check">
-                                    <input type="checkbox" class="practice-checkbox" data-practice="tuesday">
-                                    <span class="checkmark"></span>
-                                </label>
-                                <div class="practice-info">
-                                    <h3>Tuesday - "Not My Circus"</h3>
-                                    <p>Practice letting someone else handle their own responsibility</p>
+                        <!-- Fearful-Avoidant Practices -->
+                        <div class="avoidant-content" style="display: none;">
+                            <div class="practice-item" data-day="monday">
+                                <div class="practice-header">
+                                    <label class="practice-check">
+                                        <input type="checkbox" class="practice-checkbox avoidant-checkbox" data-practice="monday">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <div class="practice-info">
+                                        <h3>Monday - Notice the Urge to Withdraw</h3>
+                                        <p>When you feel the pull to create distance from Charlie, pause and name the trigger</p>
+                                    </div>
+                                    <button class="info-btn" data-practice="av-monday">?</button>
                                 </div>
-                                <button class="info-btn" data-practice="tuesday">?</button>
+                                <div class="examples-section">
+                                    <strong>Examples:</strong>
+                                    <ul>
+                                        <li>Charlie says something loving → you feel urge to pick a fight or go cold. Pause. Name it: "I'm feeling vulnerable"</li>
+                                        <li>After closeness, you want space. Notice: "Intimacy is activating my nervous system, not a real threat"</li>
+                                    </ul>
+                                </div>
+                                <div class="why-section" id="why-av-monday">
+                                    <p>Fearful-avoidant attachment creates an automatic "deactivating" response when intimacy increases - your nervous system perceives closeness as danger. Research on attachment shows that simply noticing and naming this pattern interrupts the automatic response. You can't change what you don't see. This metacognitive awareness is the first step to choosing differently.</p>
+                                </div>
+                                <input type="text" class="practice-note avoidant-note" data-practice="monday" placeholder="Notes (optional)" maxlength="200">
                             </div>
-                            <div class="examples-section">
-                                <strong>Examples:</strong>
-                                <ul>
-                                    <li>A friend complains about a problem - listen without offering solutions or fixing it for them</li>
-                                    <li>A family member is running late for their own appointment - resist the urge to remind them</li>
-                                </ul>
-                            </div>
-                            <div class="why-section" id="why-tuesday">
-                                <p>Research shows that people who set and maintain boundaries report higher life satisfaction and lower anxiety. In family systems theory, overfunctioning and underfunctioning exist as reciprocal patterns - when you step back, others have space to step up. This practice applies boundary-setting principles specifically to overfunctioning dynamics.</p>
-                            </div>
-                            <input type="text" class="practice-note" data-practice="tuesday" placeholder="Notes (optional)" maxlength="200">
-                        </div>
 
-                        <div class="practice-item" data-day="wednesday">
-                            <div class="practice-header">
-                                <label class="practice-check">
-                                    <input type="checkbox" class="practice-checkbox" data-practice="wednesday">
-                                    <span class="checkmark"></span>
-                                </label>
-                                <div class="practice-info">
-                                    <h3>Wednesday - Schedule Personal Time</h3>
-                                    <p>Block 30 minutes for something you want (non-negotiable)</p>
+                            <div class="practice-item" data-day="tuesday">
+                                <div class="practice-header">
+                                    <label class="practice-check">
+                                        <input type="checkbox" class="practice-checkbox avoidant-checkbox" data-practice="tuesday">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <div class="practice-info">
+                                        <h3>Tuesday - Stay 10% Longer</h3>
+                                        <p>When closeness with Charlie feels uncomfortable, stay slightly longer instead of escaping</p>
+                                    </div>
+                                    <button class="info-btn" data-practice="av-tuesday">?</button>
                                 </div>
-                                <button class="info-btn" data-practice="wednesday">?</button>
+                                <div class="examples-section">
+                                    <strong>Examples:</strong>
+                                    <ul>
+                                        <li>During a vulnerable conversation, resist the urge to change the subject or make a joke</li>
+                                        <li>When Charlie shows affection, stay present for a few more seconds instead of pulling away or deflecting</li>
+                                    </ul>
+                                </div>
+                                <div class="why-section" id="why-av-tuesday">
+                                    <p>Your window of tolerance for intimacy expands through gradual exposure. Stan Tatkin's research on couples shows that staying present during discomfort - even briefly - builds new neural pathways. You're teaching your nervous system that closeness is safe. Small stretches compound over time into secure relating.</p>
+                                </div>
+                                <input type="text" class="practice-note avoidant-note" data-practice="tuesday" placeholder="Notes (optional)" maxlength="200">
                             </div>
-                            <div class="examples-section">
-                                <strong>Examples:</strong>
-                                <ul>
-                                    <li>Block 30 min labeled "busy" - walk, read, or do nothing, even if your to-do list isn't done</li>
-                                    <li>Take a full lunch break away from your desk without checking messages</li>
-                                </ul>
-                            </div>
-                            <div class="why-section" id="why-wednesday">
-                                <p>Chronic self-sacrifice and overcommitment are linked to burnout. Studies on boundary-setting show that protecting personal time reduces emotional exhaustion. This practice reverses the overfunctioner's typical pattern of attending to everyone else's needs before their own.</p>
-                            </div>
-                            <input type="text" class="practice-note" data-practice="wednesday" placeholder="Notes (optional)" maxlength="200">
-                        </div>
 
-                        <div class="practice-item" data-day="thursday">
-                            <div class="practice-header">
-                                <label class="practice-check">
-                                    <input type="checkbox" class="practice-checkbox" data-practice="thursday">
-                                    <span class="checkmark"></span>
-                                </label>
-                                <div class="practice-info">
-                                    <h3>Thursday - Practice "Good Enough"</h3>
-                                    <p>Do one task at 80% instead of 100%</p>
+                            <div class="practice-item" data-day="wednesday">
+                                <div class="practice-header">
+                                    <label class="practice-check">
+                                        <input type="checkbox" class="practice-checkbox avoidant-checkbox" data-practice="wednesday">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <div class="practice-info">
+                                        <h3>Wednesday - Ask Directly (No Testing)</h3>
+                                        <p>Express a need to Charlie clearly instead of hinting, testing, or expecting mind-reading</p>
+                                    </div>
+                                    <button class="info-btn" data-practice="av-wednesday">?</button>
                                 </div>
-                                <button class="info-btn" data-practice="thursday">?</button>
+                                <div class="examples-section">
+                                    <strong>Examples:</strong>
+                                    <ul>
+                                        <li>Instead of withdrawing to see if Charlie chases you, say "I need some reassurance right now"</li>
+                                        <li>Replace "It's fine, do whatever you want" with "I'd really like it if we spent time together tonight"</li>
+                                    </ul>
+                                </div>
+                                <div class="why-section" id="why-av-wednesday">
+                                    <p>Fearful-avoidant attachment often leads to "protest behaviors" - indirect ways of seeking reassurance that often backfire (withdrawing, testing, hinting). Sue Johnson's Emotionally Focused Therapy research shows that clearly stating attachment needs ("I need to feel close to you") is far more effective than protest behaviors, and builds secure connection.</p>
+                                </div>
+                                <input type="text" class="practice-note avoidant-note" data-practice="wednesday" placeholder="Notes (optional)" maxlength="200">
                             </div>
-                            <div class="examples-section">
-                                <strong>Examples:</strong>
-                                <ul>
-                                    <li>Send an email without re-reading it 3 times - one quick proof and send</li>
-                                    <li>Leave a room 80% tidy, or submit work without one final polish pass</li>
-                                </ul>
-                            </div>
-                            <div class="why-section" id="why-thursday">
-                                <p>Perfectionism and anxiety are strongly linked - when standards are impossibly high, anxiety increases. CBT for perfectionism shows moderate effect sizes in reducing both perfectionism and anxiety symptoms. This exercise uses exposure therapy principles: practicing imperfection in low-stakes situations helps you learn that "good enough" rarely leads to the catastrophic outcomes perfectionism predicts.</p>
-                            </div>
-                            <input type="text" class="practice-note" data-practice="thursday" placeholder="Notes (optional)" maxlength="200">
-                        </div>
 
-                        <div class="practice-item" data-day="friday">
-                            <div class="practice-header">
-                                <label class="practice-check">
-                                    <input type="checkbox" class="practice-checkbox" data-practice="friday">
-                                    <span class="checkmark"></span>
-                                </label>
-                                <div class="practice-info">
-                                    <h3>Friday - No Automatic Yes</h3>
-                                    <p>Pause 10 seconds before responding to requests, say no to one thing</p>
+                            <div class="practice-item" data-day="thursday">
+                                <div class="practice-header">
+                                    <label class="practice-check">
+                                        <input type="checkbox" class="practice-checkbox avoidant-checkbox" data-practice="thursday">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <div class="practice-info">
+                                        <h3>Thursday - Reality-Check the Threat</h3>
+                                        <p>When triggered, ask: "Is this about Charlie now, or am I reacting to an old wound?"</p>
+                                    </div>
+                                    <button class="info-btn" data-practice="av-thursday">?</button>
                                 </div>
-                                <button class="info-btn" data-practice="friday">?</button>
+                                <div class="examples-section">
+                                    <strong>Examples:</strong>
+                                    <ul>
+                                        <li>Charlie seems distant → Before assuming rejection, ask: "Could something else be going on for them?"</li>
+                                        <li>You feel criticized → Pause: "Is Charlie actually attacking me, or am I hearing my past?"</li>
+                                    </ul>
+                                </div>
+                                <div class="why-section" id="why-av-thursday">
+                                    <p>Attachment wounds create a "lens" that distorts present-day interactions. Your brain pattern-matches current situations to past pain, triggering responses that may not fit the actual situation. CBT and attachment research both show that pausing to reality-test ("Is this really happening NOW?") reduces emotional reactivity and prevents unnecessary conflict.</p>
+                                </div>
+                                <input type="text" class="practice-note avoidant-note" data-practice="thursday" placeholder="Notes (optional)" maxlength="200">
                             </div>
-                            <div class="examples-section">
-                                <strong>Examples:</strong>
-                                <ul>
-                                    <li>"Can you help with X?" → "Let me check and get back to you" instead of instant yes</li>
-                                    <li>Decline one optional meeting, social invite, or favor - even a small one counts</li>
-                                </ul>
-                            </div>
-                            <div class="why-section" id="why-friday">
-                                <p>Overfunctioners often respond immediately to requests without checking their own capacity. Research on decision-making shows that even brief pauses improve the quality of choices. This practice creates space to assess whether a request aligns with your boundaries and capacity before automatically agreeing.</p>
-                            </div>
-                            <input type="text" class="practice-note" data-practice="friday" placeholder="Notes (optional)" maxlength="200">
-                        </div>
 
-                        <div class="practice-item" data-day="weekend">
-                            <div class="practice-header">
-                                <label class="practice-check">
-                                    <input type="checkbox" class="practice-checkbox" data-practice="weekend">
-                                    <span class="checkmark"></span>
-                                </label>
-                                <div class="practice-info">
-                                    <h3>Weekend - Rest Without Earning It</h3>
-                                    <p>Do something restful without completing your to-do list first</p>
+                            <div class="practice-item" data-day="friday">
+                                <div class="practice-header">
+                                    <label class="practice-check">
+                                        <input type="checkbox" class="practice-checkbox avoidant-checkbox" data-practice="friday">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <div class="practice-info">
+                                        <h3>Friday - Receive Without Sabotaging</h3>
+                                        <p>When Charlie shows love, let it in without deflecting, dismissing, or creating conflict</p>
+                                    </div>
+                                    <button class="info-btn" data-practice="av-friday">?</button>
                                 </div>
-                                <button class="info-btn" data-practice="weekend">?</button>
+                                <div class="examples-section">
+                                    <strong>Examples:</strong>
+                                    <ul>
+                                        <li>Charlie compliments you → Say "thank you, that means a lot" and sit with it, don't undermine it</li>
+                                        <li>Charlie plans something special → Receive it without finding flaws or pushing them away</li>
+                                    </ul>
+                                </div>
+                                <div class="why-section" id="why-av-friday">
+                                    <p>Fearful-avoidant attachment often includes difficulty receiving love - it feels unsafe, so you unconsciously sabotage it. Research shows that behaviorally accepting care (even when uncomfortable) gradually rewires your expectations. Each time you let love in without destroying it, you build evidence that you can be loved safely.</p>
+                                </div>
+                                <input type="text" class="practice-note avoidant-note" data-practice="friday" placeholder="Notes (optional)" maxlength="200">
                             </div>
-                            <div class="examples-section">
-                                <strong>Examples:</strong>
-                                <ul>
-                                    <li>Watch a show or nap while dishes are in the sink or laundry is unfolded</li>
-                                    <li>Say "I'm resting today" without justifying it with how hard you worked</li>
-                                </ul>
+
+                            <div class="practice-item" data-day="weekend">
+                                <div class="practice-header">
+                                    <label class="practice-check">
+                                        <input type="checkbox" class="practice-checkbox avoidant-checkbox" data-practice="weekend">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <div class="practice-info">
+                                        <h3>Weekend - Self-Soothing Practice</h3>
+                                        <p>Calm your nervous system when activated, without seeking reassurance or withdrawing from Charlie</p>
+                                    </div>
+                                    <button class="info-btn" data-practice="av-weekend">?</button>
+                                </div>
+                                <div class="examples-section">
+                                    <strong>Examples:</strong>
+                                    <ul>
+                                        <li>When feeling anxious, use grounding (5 senses, deep breathing) before bringing it to Charlie</li>
+                                        <li>Journal about what you're feeling first - distinguish old wounds from current reality</li>
+                                    </ul>
+                                </div>
+                                <div class="why-section" id="why-av-weekend">
+                                    <p>Fearful-avoidant attachment often means oscillating between anxiously seeking reassurance and avoidantly withdrawing. Learning to regulate your own nervous system first gives you a third option. Polyvagal theory research shows that self-soothing practices (breathing, grounding) activate the "social engagement" system, allowing you to connect from a calmer place.</p>
+                                </div>
+                                <input type="text" class="practice-note avoidant-note" data-practice="weekend" placeholder="Notes (optional)" maxlength="200">
                             </div>
-                            <div class="why-section" id="why-weekend">
-                                <p>Overfunctioners often believe rest must be "earned" through productivity. This reflects perfectionistic thinking that links self-worth to achievement. Research on self-compassion shows that treating yourself with kindness (rather than constantly striving) improves mental health outcomes. This practice challenges the belief that your value depends on constant doing.</p>
-                            </div>
-                            <input type="text" class="practice-note" data-practice="weekend" placeholder="Notes (optional)" maxlength="200">
                         </div>
 
                         <button class="save-practices-btn" id="save-practices">Save Practices</button>
 
                         <div class="disclaimer">
-                            <p>This program is based on established therapeutic principles from Cognitive Behavioral Therapy (CBT), family systems theory, and mindfulness-based approaches. While the underlying concepts are research-supported, this specific weekly structure has not been tested in clinical trials. Think of it as applying proven principles to your particular situation. If you need clinical support, please consult a licensed therapist.</p>
+                            <p>This program is based on established therapeutic principles from Cognitive Behavioral Therapy (CBT), exposure therapy, and self-compassion research. While the underlying concepts are research-supported, this specific weekly structure has not been tested in clinical trials. Think of it as applying proven principles to your particular situation. If you need clinical support, please consult a licensed therapist.</p>
                         </div>
                     </div>
                 </div>
