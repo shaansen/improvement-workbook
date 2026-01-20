@@ -113,8 +113,16 @@
             <div class="view-content">
                 <!-- Track Selector -->
                 <div class="track-selector">
-                    <button class="track-btn active" data-track="overfunctioning">Overfunctioning</button>
-                    <button class="track-btn" data-track="avoidant">Fearful-Avoidant</button>
+                    <button class="track-btn active" data-track="overfunctioning">
+                        <span class="track-icon-label">↓</span>
+                        <span class="track-name">Overfunctioning</span>
+                        <span class="track-status-indicator">○</span>
+                    </button>
+                    <button class="track-btn" data-track="avoidant">
+                        <span class="track-icon-label">♥</span>
+                        <span class="track-name">Fearful-Avoidant</span>
+                        <span class="track-status-indicator">○</span>
+                    </button>
                 </div>
 
                 <div class="checkin-header">
@@ -560,6 +568,7 @@
         <div class="modal-content">
             <h3>Edit Entry</h3>
             <p class="modal-date" id="edit-date"></p>
+            <p class="modal-track-label" id="edit-track-label"></p>
             <div class="modal-body">
                 <div class="checkin-buttons modal-buttons">
                     <button class="checkin-btn yes-btn" id="modal-yes">Yes</button>

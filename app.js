@@ -15,14 +15,20 @@ const App = {
             question: 'Did you practice stepping back today?',
             yesLabel: 'Stepped back',
             noLabel: 'Did not step back',
-            description: 'Track progress on stepping back from overfunctioning patterns'
+            description: 'Track progress on stepping back from overfunctioning patterns',
+            icon: '↓',
+            iconYes: '↓',
+            iconNo: '↓'
         },
         avoidant: {
             name: 'Fearful-Avoidant',
             question: 'Did you practice staying present today?',
             yesLabel: 'Stayed present',
             noLabel: 'Did not stay present',
-            description: 'Track progress on staying present in relationships despite fear'
+            description: 'Track progress on staying present in relationships despite fear',
+            icon: '♥',
+            iconYes: '♥',
+            iconNo: '♥'
         }
     },
 
@@ -500,8 +506,47 @@ const App = {
             const data = await CryptoUtils.decrypt(JSON.parse(encrypted), this.currentPin);
             if (data) {
                 this.entries = data.entries || [];
+                // Migrate old entries to new dual-track format
+                this.migrateEntries();
             }
         }
+    },
+
+    // Migrate old single-track entries to dual-track format
+    migrateEntries() {
+        let needsSave = false;
+        this.entries.forEach(entry => {
+            // If entry has old format (steppedBack but no trackResponses)
+            if (!entry.trackResponses) {
+                entry.trackResponses = {
+                    overfunctioning: {
+                        response: entry.steppedBack,
+                        note: entry.note || ''
+                    },
+                    avoidant: {
+                        response: null,
+                        note: ''
+                    }
+                };
+                needsSave = true;
+            }
+        });
+        if (needsSave) {
+            this.saveData();
+        }
+    },
+
+    // Get response for a specific track on a date
+    getTrackResponse(entry, track) {
+        if (!entry) return null;
+        if (entry.trackResponses && entry.trackResponses[track]) {
+            return entry.trackResponses[track].response;
+        }
+        // Fallback for old format
+        if (track === 'overfunctioning') {
+            return entry.steppedBack;
+        }
+        return null;
     },
 
     async saveData() {
@@ -563,13 +608,16 @@ const App = {
         document.getElementById('checkin-question').textContent = track.question;
 
         const todayEntry = this.getTodayEntry();
+        const currentTrackResponse = this.getTrackResponse(todayEntry, this.currentTrack);
 
-        if (todayEntry) {
+        if (currentTrackResponse !== null) {
             document.getElementById('quick-checkin').style.display = 'none';
             document.getElementById('checkin-done').style.display = 'block';
             document.getElementById('done-response').textContent =
-                todayEntry.steppedBack ? track.yesLabel : track.noLabel;
-            document.getElementById('done-note').textContent = todayEntry.note || '';
+                currentTrackResponse ? track.yesLabel : track.noLabel;
+
+            const trackNote = todayEntry.trackResponses?.[this.currentTrack]?.note || todayEntry.note || '';
+            document.getElementById('done-note').textContent = trackNote;
 
             // Load practices
             this.loadPracticesForToday(todayEntry);
@@ -579,15 +627,38 @@ const App = {
             document.getElementById('quick-note').value = '';
             document.getElementById('char-count').textContent = '0';
 
-            // Reset practices
+            // Reset practices for current track
             this.resetPractices();
         }
 
         // Show today's practice
         this.renderTodaysPractice(today.getDay());
 
-        // Update track UI
+        // Update track UI and status indicators
         this.updateTrackUI();
+        this.updateTrackStatusIndicators(todayEntry);
+    },
+
+    // Update the track selector to show check-in status
+    updateTrackStatusIndicators(entry) {
+        document.querySelectorAll('.track-btn').forEach(btn => {
+            const track = btn.dataset.track;
+            const response = this.getTrackResponse(entry, track);
+            const indicator = btn.querySelector('.track-status-indicator');
+
+            if (indicator) {
+                if (response === true) {
+                    indicator.className = 'track-status-indicator checked-yes';
+                    indicator.textContent = '✓';
+                } else if (response === false) {
+                    indicator.className = 'track-status-indicator checked-no';
+                    indicator.textContent = '✗';
+                } else {
+                    indicator.className = 'track-status-indicator';
+                    indicator.textContent = '○';
+                }
+            }
+        });
     },
 
     renderTodaysPractice(dayOfWeek) {
@@ -599,24 +670,50 @@ const App = {
         examplesList.innerHTML = practice.examples.map(ex => `<li>${ex}</li>`).join('');
     },
 
-    async doCheckin(steppedBack) {
+    async doCheckin(response) {
         const today = this.formatDate(new Date());
         const note = document.getElementById('quick-note').value.trim();
 
-        const entry = {
-            date: today,
-            timestamp: new Date().toISOString(),
-            steppedBack: steppedBack,
-            note: note,
-            practices: {}
+        let entry = this.entries.find(e => e.date === today);
+
+        if (!entry) {
+            entry = {
+                date: today,
+                timestamp: new Date().toISOString(),
+                steppedBack: null, // Keep for backward compatibility
+                note: '',
+                practices: {},
+                trackResponses: {
+                    overfunctioning: { response: null, note: '' },
+                    avoidant: { response: null, note: '' }
+                }
+            };
+            this.entries.push(entry);
+        }
+
+        // Ensure trackResponses exists
+        if (!entry.trackResponses) {
+            entry.trackResponses = {
+                overfunctioning: { response: null, note: '' },
+                avoidant: { response: null, note: '' }
+            };
+        }
+
+        // Update the current track's response
+        entry.trackResponses[this.currentTrack] = {
+            response: response,
+            note: note
         };
 
-        // Remove existing entry for today if any
-        this.entries = this.entries.filter(e => e.date !== today);
-        this.entries.push(entry);
+        // Update timestamp
+        entry.timestamp = new Date().toISOString();
+
+        // Keep backward compatibility - use overfunctioning as the main steppedBack
+        entry.steppedBack = entry.trackResponses.overfunctioning.response;
+        entry.note = entry.trackResponses.overfunctioning.note;
 
         await this.saveData();
-        this.showToast('Check-in saved');
+        this.showToast(`${this.tracks[this.currentTrack].name} check-in saved`);
         this.renderCheckin();
     },
 
@@ -705,8 +802,9 @@ const App = {
             grid.appendChild(emptyEl);
         }
 
-        // Days of the month
-        let checkinCount = 0;
+        // Days of the month - track stats for both tracks
+        let overfunctioningCount = 0;
+        let avoidantCount = 0;
         let totalDaysUpToToday = 0;
 
         for (let day = 1; day <= daysInMonth; day++) {
@@ -727,14 +825,48 @@ const App = {
                 totalDaysUpToToday++;
             }
 
-            if (entry && entry.steppedBack !== null) {
-                dayEl.classList.add(entry.steppedBack ? 'yes' : 'no');
-                if (!isFuture) checkinCount++;
+            // Get responses for both tracks
+            const overfunctioningResponse = this.getTrackResponse(entry, 'overfunctioning');
+            const avoidantResponse = this.getTrackResponse(entry, 'avoidant');
+
+            // Count check-ins
+            if (!isFuture) {
+                if (overfunctioningResponse !== null) overfunctioningCount++;
+                if (avoidantResponse !== null) avoidantCount++;
+            }
+
+            // Build status icons for both tracks
+            let statusHtml = '<span class="day-status dual-status">';
+
+            // Overfunctioning icon (↓)
+            if (overfunctioningResponse !== null) {
+                statusHtml += `<span class="track-icon overfunctioning ${overfunctioningResponse ? 'yes' : 'no'}">↓</span>`;
+            } else {
+                statusHtml += '<span class="track-icon overfunctioning empty">○</span>';
+            }
+
+            // Avoidant icon (♥)
+            if (avoidantResponse !== null) {
+                statusHtml += `<span class="track-icon avoidant ${avoidantResponse ? 'yes' : 'no'}">♥</span>`;
+            } else {
+                statusHtml += '<span class="track-icon avoidant empty">○</span>';
+            }
+
+            statusHtml += '</span>';
+
+            // Determine day background based on both responses
+            const bothCheckedIn = overfunctioningResponse !== null && avoidantResponse !== null;
+            const oneCheckedIn = overfunctioningResponse !== null || avoidantResponse !== null;
+
+            if (bothCheckedIn) {
+                dayEl.classList.add('both-checked');
+            } else if (oneCheckedIn) {
+                dayEl.classList.add('partial-checked');
             }
 
             dayEl.innerHTML = `
                 <span class="day-num">${day}</span>
-                <span class="day-status">${entry && entry.steppedBack !== null ? (entry.steppedBack ? '&#10003;' : '&#8212;') : ''}</span>
+                ${statusHtml}
             `;
 
             if (!isFuture) {
@@ -744,12 +876,22 @@ const App = {
             grid.appendChild(dayEl);
         }
 
-        // Summary
-        const summaryText = this.currentMonthOffset === 0
-            ? `You checked in ${checkinCount} out of ${totalDaysUpToToday} days this month`
-            : `You checked in ${checkinCount} out of ${daysInMonth} days`;
+        // Summary for both tracks
+        const totalDays = this.currentMonthOffset === 0 ? totalDaysUpToToday : daysInMonth;
+        const summaryHtml = `
+            <div class="dual-summary">
+                <div class="summary-item">
+                    <span class="summary-icon overfunctioning">↓</span>
+                    <span>Overfunctioning: ${overfunctioningCount}/${totalDays} days</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-icon avoidant">♥</span>
+                    <span>Fearful-Avoidant: ${avoidantCount}/${totalDays} days</span>
+                </div>
+            </div>
+        `;
 
-        document.getElementById('month-summary').innerHTML = `<p>${summaryText}</p>`;
+        document.getElementById('month-summary').innerHTML = summaryHtml;
     },
 
     // History view
@@ -784,15 +926,55 @@ const App = {
             return;
         }
 
-        const track = this.tracks[this.currentTrack];
         list.innerHTML = filtered.map(entry => {
             const practices = entry.practices ? Object.keys(entry.practices)
                 .filter(k => !k.endsWith('_note') && entry.practices[k])
                 .map(k => this.getPracticeLabel(k)) : [];
 
             const timeStr = entry.timestamp ? this.formatTime(entry.timestamp) : '';
-            const yesText = `&#10003; ${track.yesLabel}`;
-            const noText = `&#8212; ${track.noLabel}`;
+
+            // Get responses for both tracks
+            const overfunctioningResponse = this.getTrackResponse(entry, 'overfunctioning');
+            const avoidantResponse = this.getTrackResponse(entry, 'avoidant');
+
+            // Get notes for both tracks
+            const overfunctioningNote = entry.trackResponses?.overfunctioning?.note || entry.note || '';
+            const avoidantNote = entry.trackResponses?.avoidant?.note || '';
+
+            // Build dual-track response display
+            let responseHtml = '<div class="history-dual-response">';
+
+            // Overfunctioning status
+            responseHtml += '<div class="history-track-status">';
+            responseHtml += '<span class="track-label">↓ Overfunctioning:</span> ';
+            if (overfunctioningResponse === null) {
+                responseHtml += '<span class="no-checkin">Not checked in</span>';
+            } else if (overfunctioningResponse) {
+                responseHtml += '<span class="yes">✓ Stepped back</span>';
+            } else {
+                responseHtml += '<span class="no">✗ Did not step back</span>';
+            }
+            if (overfunctioningNote) {
+                responseHtml += ` <span class="inline-note">"${overfunctioningNote}"</span>`;
+            }
+            responseHtml += '</div>';
+
+            // Avoidant status
+            responseHtml += '<div class="history-track-status">';
+            responseHtml += '<span class="track-label">♥ Fearful-Avoidant:</span> ';
+            if (avoidantResponse === null) {
+                responseHtml += '<span class="no-checkin">Not checked in</span>';
+            } else if (avoidantResponse) {
+                responseHtml += '<span class="yes">✓ Stayed present</span>';
+            } else {
+                responseHtml += '<span class="no">✗ Did not stay present</span>';
+            }
+            if (avoidantNote) {
+                responseHtml += ` <span class="inline-note">"${avoidantNote}"</span>`;
+            }
+            responseHtml += '</div>';
+
+            responseHtml += '</div>';
 
             return `
                 <div class="history-item" data-date="${entry.date}">
@@ -800,10 +982,7 @@ const App = {
                         <span class="history-date">${this.formatDisplayDate(entry.date)}</span>
                         ${timeStr ? `<span class="history-time">${timeStr}</span>` : ''}
                     </div>
-                    <div class="history-response ${entry.steppedBack ? 'yes' : 'no'}">
-                        ${entry.steppedBack === null ? 'No check-in' : (entry.steppedBack ? yesText : noText)}
-                    </div>
-                    ${entry.note ? `<div class="history-note">"${entry.note}"</div>` : ''}
+                    ${responseHtml}
                     ${practices.length > 0 ? `
                         <div class="history-practices">
                             ${practices.map(p => `<span>${p}</span>`).join('')}
@@ -846,36 +1025,60 @@ const App = {
     openEditModal(dateStr) {
         this.editingEntryDate = dateStr;
         const entry = this.entries.find(e => e.date === dateStr);
+        const track = this.tracks[this.currentTrack];
+        const response = this.getTrackResponse(entry, this.currentTrack);
+        const trackNote = entry?.trackResponses?.[this.currentTrack]?.note ||
+                         (this.currentTrack === 'overfunctioning' ? entry?.note : '') || '';
 
         document.getElementById('edit-date').textContent = this.formatDisplayDate(dateStr);
-        document.getElementById('modal-note').value = entry ? entry.note || '' : '';
+        document.getElementById('edit-track-label').textContent = `Editing: ${track.name}`;
+        document.getElementById('modal-note').value = trackNote;
 
-        document.getElementById('modal-yes').classList.toggle('selected', entry && entry.steppedBack === true);
-        document.getElementById('modal-no').classList.toggle('selected', entry && entry.steppedBack === false);
+        document.getElementById('modal-yes').classList.toggle('selected', response === true);
+        document.getElementById('modal-no').classList.toggle('selected', response === false);
 
         document.getElementById('edit-modal').classList.add('active');
     },
 
     async saveEditedEntry() {
-        const steppedBack = document.getElementById('modal-yes').classList.contains('selected') ? true :
+        const response = document.getElementById('modal-yes').classList.contains('selected') ? true :
             document.getElementById('modal-no').classList.contains('selected') ? false : null;
         const note = document.getElementById('modal-note').value.trim();
 
         let entry = this.entries.find(e => e.date === this.editingEntryDate);
 
-        if (entry) {
-            entry.steppedBack = steppedBack;
-            entry.note = note;
-        } else {
+        if (!entry) {
             entry = {
                 date: this.editingEntryDate,
                 timestamp: new Date().toISOString(),
-                steppedBack: steppedBack,
-                note: note,
-                practices: {}
+                steppedBack: null,
+                note: '',
+                practices: {},
+                trackResponses: {
+                    overfunctioning: { response: null, note: '' },
+                    avoidant: { response: null, note: '' }
+                }
             };
             this.entries.push(entry);
         }
+
+        // Ensure trackResponses exists
+        if (!entry.trackResponses) {
+            entry.trackResponses = {
+                overfunctioning: { response: entry.steppedBack, note: entry.note || '' },
+                avoidant: { response: null, note: '' }
+            };
+        }
+
+        // Update the current track's response
+        entry.trackResponses[this.currentTrack] = {
+            response: response,
+            note: note
+        };
+
+        // Keep backward compatibility
+        entry.steppedBack = entry.trackResponses.overfunctioning.response;
+        entry.note = entry.trackResponses.overfunctioning.note;
 
         await this.saveData();
         this.closeModal('edit-modal');
